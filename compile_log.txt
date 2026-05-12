@@ -1,6 +1,1 @@
-gcc -Wall -Werror -Wextra -std=c11 -g -c cat.c -o obj/cat.o
-gcc -Wall -Werror -Wextra -std=c11 -g -c common/arg_parser.c -o obj/arg_parser.o
-gcc -Wall -Werror -Wextra -std=c11 -g -c common/file_utils.c -o obj/file_utils.o
-gcc -Wall -Werror -Wextra -std=c11 -g -c grep.c -o obj/grep.o
-gcc -Wall -Werror -Wextra -std=c11 -g -o s21_cat obj/cat.o obj/arg_parser.o obj/file_utils.o 
-gcc -Wall -Werror -Wextra -std=c11 -g -o s21_grep obj/grep.o obj/arg_parser.o obj/file_utils.o
+make: Цель «all» не требует выполнения команд.
