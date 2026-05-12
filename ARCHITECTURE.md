@@ -1,102 +1,105 @@
-# Архитектура проекта
+# Architecture Documentation for C2_SimpleBashUtils
 
-## Структура каталогов
+## Project Overview
+Implementation of simplified versions of standard Unix utilities `cat` and `grep` in C.
 
+## Project Structure
 ```
-src/
-├── cat/
-│   ├── s21_cat.c          # основная логика cat
-│   ├── cat_processor.c    # обработка флагов и вывод
-│   ├── cat_processor.h
-│   └── Makefile           # цели для cat
-├── grep/
-│   ├── s21_grep.c         # основная логика grep
-│   ├── grep_processor.c   # парсинг шаблонов, поиск
-│   ├── grep_processor.h
-│   └── Makefile
-├── common/
-│   ├── file_utils.c       # общие функции работы с файлами
-│   ├── file_utils.h
-│   ├── arg_parser.c       # универсальный парсер аргументов
-│   └── arg_parser.h
-└── tests/
-    ├── test_cat.sh
-    ├── test_grep.sh
-    └── test_common.sh
+.
+├── cat.c                  # s21_cat utility implementation
+├── grep.c                 # s21_grep utility implementation
+├── common/                # Shared modules
+│   ├── arg_parser.h       # Argument parsing interface
+│   ├── arg_parser.c       # Argument parsing implementation
+│   ├── file_utils.h       # File I/O utilities interface
+│   └── file_utils.c       # File I/O utilities implementation
+├── Makefile               # Build configuration
+├── test.sh                # Test suite (optional)
+└── ARCHITECTURE.md        # This file
 ```
 
-## Модули и интерфейсы
+## Modules
 
-### `common/arg_parser`
-- Разбор аргументов командной строки, сбор флагов и списка файлов.
-- Для cat: структура `cat_flags` с полями `b, e, E, n, s, t, T, v`.
-- Для grep: структура `grep_flags` с полями `e, i, v, c, l, n` (и опционально `h, s, f, o`).
-- Функции: `parse_cat_args()`, `parse_grep_args()`.
+### Common Module
+Shared utilities used by both `s21_cat` and `s21_grep`.
 
-### `common/file_utils`
-- Открытие файла, чтение построчно, обработка ошибок (нет файла / нет прав).
-- Функции: `file_open_safe()`, `file_read_line()`, `file_close()`.
-- При необходимости – поддержка чтения из `stdin`.
+#### arg_parser
+- **Purpose**: Parse command-line arguments for both utilities
+- **Functions**:
+  - `parse_cat_args()`: Parse cat-specific options and file arguments
+  - `parse_grep_args()`: Parse grep-specific options, patterns, and file arguments
+  - `free_parsed_args()`: Free dynamically allocated argument arrays
 
-### `cat/cat_processor`
-- Логика применения флагов к строкам:
-  - `process_cat_file()` – принимает флаги и файл, выводит результат.
-  - Внутренние функции: `number_lines()`, `squeeze_blank()`, `print_nonprintable()` и т.д.
-- Обработка флага `-e` / `-E` (добавление `$`).
+#### file_utils
+- **Purpose**: Safe file operations with stdin handling
+- **Functions**:
+  - `file_open_safe()`: Open file or return stdin for "-"
+  - `file_read_line()`: Read line using getline
+  - `file_close_safe()`: Close file (skip stdin)
+  - `file_is_stdin()`: Check if FILE* is stdin
 
-### `grep/grep_processor`
-- Компиляция регулярных выражений (через `regcomp()`).
-- Управление несколькими шаблонами (список строк).
-- Основные функции:
-  - `compile_patterns()` – компиляция всех шаблонов.
-  - `grep_file()` – поиск в одном файле с учётом флагов.
-  - Поддержка `-c` (count), `-l` (files with match), `-n` (line numbers), `-v` (invert), `-i` (case insens.).
-- Для бонусов: `-f` (читать шаблоны из файла), `-o` (выводить только совпадения).
+### s21_cat Utility
+**Supported flags**: -b, -e, -E, -n, -s, -t, -T, -v
 
-## Система сборки (Makefile)
+**Implementation details**:
+- Processes one or more files sequentially
+- Handles stdin when no files or "-" specified
+- Implements line numbering with proper handling of empty lines
+- Squeezes consecutive empty lines when -s specified
+- Displays non-printing characters when -v, -t, -e specified
 
-### Корневой Makefile (в `src/`) – не обязателен, но удобен:
-```makefile
-all: s21_cat s21_grep
+### s21_grep Utility
+**Supported flags**: -e, -i, -v, -c, -l, -n, -h, -s, -f, -o
 
-s21_cat:
-	make -C cat
+**Implementation details**:
+- Uses POSIX regex (regcomp, regexec)
+- Supports multiple patterns via -e or -f
+- Inverts matching with -v
+- Counts matches with -c
+- Shows only matching parts with -o
+- Handles multiple files with appropriate filename prefixes
 
-s21_grep:
-	make -C grep
+## Build System
 
-clean:
-	make -C cat clean
-	make -C grep clean
-	rm -f tests/*.log
+### Makefile Targets
+- `all` or default: Build both utilities
+- `s21_cat`: Build only cat utility
+- `s21_grep`: Build only grep utility
+- `clean`: Remove object files and executables
+- `test`: Run test suite
+- `gcov_report`: Generate code coverage report
+- `install`: Install binaries to /usr/local/bin
+- `uninstall`: Remove installed binaries
+- `dvi`: Display documentation info
+- `dist`: Create distribution archive
 
-test:
-	./tests/test_cat.sh
-	./tests/test_grep.sh
-```
+### Compilation Flags
+- `-Wall -Werror -Wextra`: Enable all warnings as errors
+- `-std=c11`: C11 standard compliance
+- `-g`: Debug information
+- `-fprofile-arcs -ftest-coverage`: Coverage analysis (for gcov_report)
 
-### Makefile для `cat` (`src/cat/Makefile`):
-- Цели: `s21_cat`, `clean`, `rebuild`, `test` (если локально).
-- Компиляция: `gcc -Wall -Werror -Wextra -std=c11 -I../common s21_cat.c cat_processor.c ../common/file_utils.c ../common/arg_parser.c -o s21_cat`
-- Переменные: `CC = gcc`, `CFLAGS`, `LDFLAGS`.
+## Coding Standards
+- **Language**: C11
+- **Style**: Google C Style Guide
+- **No unsafe functions**: No gets, strcpy, sprintf, etc.
+- **Memory management**: All dynamic memory must be freed
+- **Error handling**: Functions return error codes, handle edge cases
+- **Warnings**: Code compiles without warnings with -Wall -Werror -Wextra
 
-### Makefile для `grep` (`src/grep/Makefile`):
-- Аналогично, с добавлением флага `-D_GNU_SOURCE` для поддержки расширенных regex.
-- Линковка с `-l` не требуется (regex в libc).
+## Dependencies
+- **Build**: gcc, make
+- **Runtime**: Standard C library
+- **Testing**: bash (for test.sh), lcov/genhtml (for coverage report)
 
-## Компилятор и флаги
-- Обязательные флаги: `-Wall -Werror -Wextra -std=c11`.
-- Дополнительно: `-pedantic`, `-D_POSIX_C_SOURCE=200809L`.
-- Для отладки: `-g -O0`.
+## Error Handling
+- Invalid arguments: Print usage and exit with code 1
+- File open errors: Print error unless -s (silent) mode
+- Memory allocation failures: Clean up and exit appropriately
+- Regex compilation errors: Report and exit
 
-## Кодирование и стиль
-- Имена переменных и функций: `snake_case`.
-- Отступы: 2 пробела (согласно Google Style).
-- Максимальная длина строки: 80 символов.
-- Комментарии для публичных функций в `.h` файлах.
-
-## Тестирование
-- Скрипты на bash (или на C с `assert`) сравнивают вывод с оригинальными утилитами.
-- Тестовые файлы: `tests/test_cat/` с текстовыми файлами разных размеров, включая спецсимволы.
-- Для каждого флага и комбинации флагов запускается сравнение.
-- Ожидается 100% покрытие всех указанных флагов (базовых и бонусных).
+## Future Extensions
+- Add more cat flags: -A, -u (if needed)
+- Add grep flag: -w (word regexp)
+- Improved performance for large files
+- Thread support for parallel file processing

@@ -26,10 +26,10 @@ $(BIN_DIR)/s21_grep: $(OBJ_DIR)/grep.o $(OBJ_DIR)/arg_parser.o $(OBJ_DIR)/file_u
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Compile rules
-$(OBJ_DIR)/cat.o: cat.c | $(OBJ_DIR)
+$(OBJ_DIR)/cat.o: cat.c common/arg_parser.h common/file_utils.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/grep.o: grep.c | $(OBJ_DIR)
+$(OBJ_DIR)/grep.o: grep.c common/arg_parser.h common/file_utils.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/arg_parser.o: $(COMMON_DIR)/arg_parser.c $(COMMON_DIR)/arg_parser.h | $(OBJ_DIR)/common

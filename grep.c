@@ -21,7 +21,7 @@ static void print_match(const char *line, const char *filename, int line_num,
                         const grep_flags *flags, int file_count,
                         char *match_start, char *match_end);
 static int match_line(const char *line, const pattern_list *pl,
-                      const grep_flags *flags, regmatch_t *pmatch);
+                      regmatch_t *pmatch);
 
 int main(int argc, char **argv) {
   grep_flags flags;
@@ -48,17 +48,17 @@ int main(int argc, char **argv) {
   for (int i = 0; i < file_count; ++i) {
     int file_matches = 0;
     process_file(files[i], &pl, &flags, file_count, &total_matches, &file_matches);
-    if (flags->l && file_matches > 0) {
+    if (flags.l && file_matches > 0) {
       printf("%s\n", files[i]);
     }
-    if (flags->c && !flags->l) {
-      if (file_count > 1 && !flags->h)
+    if (flags.c && !flags.l) {
+      if (file_count > 1 && !flags.h)
         printf("%s:", files[i]);
       printf("%d\n", file_matches);
     }
   }
 
-  if (flags->c && !flags->l && file_count == 0) {
+  if (flags.c && !flags.l && file_count == 0) {
     printf("%d\n", total_matches);
   }
 
@@ -113,7 +113,7 @@ static void process_file(const char *path, const pattern_list *pl,
     if (read > 0 && line[read - 1] == '\n') line[read - 1] = '\0';
 
     regmatch_t pmatch;
-    int matched = match_line(line, pl, flags, &pmatch);
+    int matched = match_line(line, pl, &pmatch);
 
     if ((matched && !flags->v) || (!matched && flags->v)) {
       matches_in_file++;
@@ -150,7 +150,7 @@ static void print_match(const char *line, const char *filename, int line_num,
 }
 
 static int match_line(const char *line, const pattern_list *pl,
-                      const grep_flags *flags, regmatch_t *pmatch) {
+                      regmatch_t *pmatch) {
   if (!pmatch) return 0;
 
   for (int i = 0; i < pl->count; ++i) {

@@ -8,8 +8,7 @@
 
 static void process_file(const char *path, const cat_flags *flags, int *line_num,
                          int *empty_line_count);
-static void output_char(char ch, const cat_flags *flags, int *line_num,
-                        int line_start, int *empty_line_count);
+static void output_char(char ch, const cat_flags *flags, int line_start);
 
 int main(int argc, char **argv) {
   cat_flags flags;
@@ -73,7 +72,7 @@ static void process_file(const char *path, const cat_flags *flags, int *line_num
     // Process each character
     for (ssize_t i = 0; i < read; ++i) {
       char ch = line[i];
-      output_char(ch, flags, line_num, line_start, empty_line_count);
+      output_char(ch, flags, line_start);
     }
 
     // Handle end of line
@@ -89,10 +88,8 @@ static void process_file(const char *path, const cat_flags *flags, int *line_num
   file_close_safe(fp, path);
 }
 
-static void output_char(char ch, const cat_flags *flags, int *line_num,
-                        int line_start, int *empty_line_count) {
-  (void)line_num;        // unused
-  (void)empty_line_count; // unused
+static void output_char(char ch, const cat_flags *flags, int line_start) {
+  (void)line_start;  // unused but kept for interface consistency
 
   if (flags->v) {
     // Non-printing characters
