@@ -1,1 +1,16 @@
-No .c files found
+s21_cat build failed:
+gcc -Wall -Werror -Wextra -std=c11 -g -c cat.c -o obj/cat.o
+
+cat.c:2:10: fatal error: common/arg_parser.h: Нет такого файла или каталога
+    2 | #include "common/arg_parser.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [Makefile:38: obj/cat.o] Ошибка 1
+s21_grep build failed:
+gcc -Wall -Werror -Wextra -std=c11 -g -c grep.c -o obj/grep.o
+
+grep.c:2:10: fatal error: common/arg_parser.h: Нет такого файла или каталога
+    2 | #include "common/arg_parser.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [Makefile:41: obj/grep.o] Ошибка 1
