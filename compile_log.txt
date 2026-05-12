@@ -1,32 +1,6 @@
-s21_cat build failed:
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c cat.c -o cat.o
 gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c common/arg_parser.c -o common/arg_parser.o
-
-common/arg_parser.c:1: error: "_GNU_SOURCE" redefined [-Werror]
-    1 | #define _GNU_SOURCE
-      | 
-<command-line>: note: this is the location of the previous definition
-common/arg_parser.c: In function ‘parse_grep_args’:
-common/arg_parser.c:70:31: error: invalid type argument of unary ‘*’ (have ‘int’)
-   70 |                     case 'i': *i = 1; break;
-      |                               ^~
-common/arg_parser.c:41:58: error: unused parameter ‘i’ [-Werror=unused-parameter]
-   41 | int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
-      |                                                     ~~~~~^
-cc1: all warnings being treated as errors
-make: *** [Makefile:24: common/arg_parser.o] Ошибка 1
-s21_grep build failed:
-gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c common/arg_parser.c -o common/arg_parser.o
-
-common/arg_parser.c:1: error: "_GNU_SOURCE" redefined [-Werror]
-    1 | #define _GNU_SOURCE
-      | 
-<command-line>: note: this is the location of the previous definition
-common/arg_parser.c: In function ‘parse_grep_args’:
-common/arg_parser.c:70:31: error: invalid type argument of unary ‘*’ (have ‘int’)
-   70 |                     case 'i': *i = 1; break;
-      |                               ^~
-common/arg_parser.c:41:58: error: unused parameter ‘i’ [-Werror=unused-parameter]
-   41 | int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
-      |                                                     ~~~~~^
-cc1: all warnings being treated as errors
-make: *** [Makefile:24: common/arg_parser.o] Ошибка 1
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c common/file_utils.c -o common/file_utils.o
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c grep.c -o grep.o
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -o s21_cat cat.o common/arg_parser.o common/file_utils.o -lm
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -o s21_grep grep.o common/arg_parser.o common/file_utils.o -lm

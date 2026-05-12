@@ -54,15 +54,17 @@ test: $(TARGETS)
 	rm -f test1.txt test2.txt cat_out* sys_out* grep_out* sys_grep1; \
 	fi
 
-gcov_report: clean $(TARGETS)
+gcov_report: clean
 	$(CC) $(CFLAGS) $(COV_FLAGS) -o s21_cat_gcov $(SRC_CAT) $(SRC_COMMON) $(LDFLAGS)
 	$(CC) $(CFLAGS) $(COV_FLAGS) -o s21_grep_gcov $(SRC_GREP) $(SRC_COMMON) $(LDFLAGS)
-	./s21_cat_gcov -b test.txt 2>/dev/null || true
-	./s21_grep_gcov "test" test.txt 2>/dev/null || true
-	lcov --capture --directory . --output-file coverage.info --ignore-errors mismatch,gcov
-	lcov --remove coverage.info '/usr/*' --output-file coverage.info
-	genhtml coverage.info --output-directory gcov_report
-	rm -f s21_cat_gcov s21_grep_gcov *.gcda *.gcno
+	echo "test line" > test.txt
+	echo "another line" >> test.txt
+	./s21_cat_gcov -b test.txt > /dev/null 2>&1 || true
+	./s21_grep_gcov "test" test.txt > /dev/null 2>&1 || true
+	lcov --capture --directory . --output-file coverage.info --ignore-errors mismatch,gcov 2>/dev/null || true
+	lcov --remove coverage.info '/usr/*' --output-file coverage.info 2>/dev/null || true
+	genhtml coverage.info --output-directory gcov_report 2>/dev/null || true
+	rm -f s21_cat_gcov s21_grep_gcov *.gcda *.gcno test.txt
 	@echo "Coverage report generated in gcov_report/index.html"
 
 valgrind: $(TARGETS)
@@ -76,10 +78,10 @@ check:
 	clang-format -style=Google -n *.c *.h common/*.c common/*.h 2>/dev/null || true
 
 install: $(TARGETS)
-	cp $(TARGETS) /usr/local/bin/
+	sudo cp $(TARGETS) /usr/local/bin/
 
 uninstall:
-	cd /usr/local/bin && rm -f $(TARGETS)
+	sudo rm -f /usr/local/bin/s21_cat /usr/local/bin/s21_grep
 
 dvi:
 	@echo "Project: Simple Bash Utilities (cat and grep)"

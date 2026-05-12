@@ -30,6 +30,13 @@ echo -e "line1\n\n\nline2" > test2.txt
 cat -s test2.txt > sys_out.txt
 diff cat_out.txt sys_out.txt && echo "✓ -s flag works" || echo "✗ -s flag failed"
 
+# Test -e (show ends)
+echo "line1" > test3.txt
+echo "line2" >> test3.txt
+./s21_cat -e test3.txt > cat_out.txt
+cat -e test3.txt > sys_out.txt
+diff cat_out.txt sys_out.txt && echo "✓ -e flag works" || echo "✗ -e flag failed"
+
 echo ""
 echo "=== Testing s21_grep ==="
 
@@ -53,8 +60,13 @@ diff grep_out.txt sys_grep.txt && echo "✓ -v flag works" || echo "✗ -v flag 
 grep -c "hello" test1.txt > sys_grep.txt
 diff grep_out.txt sys_grep.txt && echo "✓ -c flag works" || echo "✗ -c flag failed"
 
+# Test -l (files with match)
+./s21_grep -l "hello" test1.txt > grep_out.txt
+grep -l "hello" test1.txt > sys_grep.txt
+diff grep_out.txt sys_grep.txt && echo "✓ -l flag works" || echo "✗ -l flag failed"
+
 # Cleanup
-rm -f test1.txt test2.txt cat_out.txt sys_out.txt grep_out.txt sys_grep.txt
+rm -f test1.txt test2.txt test3.txt cat_out.txt sys_out.txt grep_out.txt sys_grep.txt
 
 echo ""
 echo "=== All tests completed ==="

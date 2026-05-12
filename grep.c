@@ -23,7 +23,6 @@ void print_matching_part(const char *line, regex_t *regex, int ignore_case) {
     (void)ignore_case;  // Suppress unused parameter warning
     regmatch_t matches[1];
     const char *p = line;
-    int offset = 0;
     
     while (regexec(regex, p, 1, matches, 0) == 0) {
         int start = matches[0].rm_so;
@@ -37,7 +36,6 @@ void print_matching_part(const char *line, regex_t *regex, int ignore_case) {
         
         // Move past this match
         p += (end > 0) ? end : 1;
-        offset += end;
     }
 }
 

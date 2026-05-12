@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include "arg_parser.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,20 +50,20 @@ int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
     int pattern_provided = 0;
     char *single_pattern = NULL;
     
-    for (int i = 1; i < argc; i++) {
-        if (argv[i][0] == '-' && argv[i][1] != '\0') {
+    for (int arg_idx = 1; arg_idx < argc; arg_idx++) {
+        if (argv[arg_idx][0] == '-' && argv[arg_idx][1] != '\0') {
             // Handle combined flags
-            for (int j = 1; argv[i][j]; j++) {
-                switch (argv[i][j]) {
+            for (int j = 1; argv[arg_idx][j]; j++) {
+                switch (argv[arg_idx][j]) {
                     case 'e': 
                         *e = 1;
-                        if (i + 1 >= argc) {
+                        if (arg_idx + 1 >= argc) {
                             fprintf(stderr, "s21_grep: option requires an argument -- 'e'\n");
                             return 1;
                         }
                         (*pattern_count)++;
                         *patterns = realloc(*patterns, sizeof(char*) * (*pattern_count));
-                        (*patterns)[*pattern_count - 1] = strdup(argv[++i]);
+                        (*patterns)[*pattern_count - 1] = strdup(argv[++arg_idx]);
                         pattern_provided = 1;
                         break;
                     case 'i': *i = 1; break;
@@ -76,30 +75,30 @@ int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
                     case 's': *s = 1; break;
                     case 'f':
                         *f = 1;
-                        if (i + 1 >= argc) {
+                        if (arg_idx + 1 >= argc) {
                             fprintf(stderr, "s21_grep: option requires an argument -- 'f'\n");
                             return 1;
                         }
                         free(*pattern_file);
-                        *pattern_file = strdup(argv[++i]);
+                        *pattern_file = strdup(argv[++arg_idx]);
                         pattern_provided = 1;
                         break;
                     case 'o': *o = 1; break;
                     default:
-                        fprintf(stderr, "s21_grep: invalid option -- '%c'\n", argv[i][j]);
+                        fprintf(stderr, "s21_grep: invalid option -- '%c'\n", argv[arg_idx][j]);
                         return 1;
                 }
             }
         } else {
             // Check if this is the pattern (when no -e or -f)
             if (!pattern_provided && *pattern_count == 0) {
-                single_pattern = strdup(argv[i]);
+                single_pattern = strdup(argv[arg_idx]);
                 pattern_provided = 1;
             } else {
                 // File argument
                 (*file_count)++;
                 *files = realloc(*files, sizeof(char*) * (*file_count));
-                (*files)[*file_count - 1] = strdup(argv[i]);
+                (*files)[*file_count - 1] = strdup(argv[arg_idx]);
             }
         }
     }
@@ -121,9 +120,9 @@ int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
         
         char *line = NULL;
         size_t len = 0;
-        ssize_t read;
-        while ((read = getline(&line, &len, pf)) != -1) {
-            if (read > 0 && line[read - 1] == '\n') line[read - 1] = '\0';
+        ssize_t bytes_read;
+        while ((bytes_read = getline(&line, &len, pf)) != -1) {
+            if (bytes_read > 0 && line[bytes_read - 1] == '\n') line[bytes_read - 1] = '\0';
             if (strlen(line) > 0) {
                 (*pattern_count)++;
                 *patterns = realloc(*patterns, sizeof(char*) * (*pattern_count));
