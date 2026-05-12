@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c11 -g
+CFLAGS = -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE
 LDFLAGS = -lm
 COV_FLAGS = -fprofile-arcs -ftest-coverage
 

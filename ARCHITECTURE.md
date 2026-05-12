@@ -64,3 +64,4 @@ Shared utilities used by both `s21_cat` and `s21_grep`.
 - **No unsafe functions**: No gets, strcpy, sprintf, etc.
 - **Memory management**: All dynamic memory must be freed
 - **Error handling**: Functions return error codes, handle edge cases
+- **Compilation**: `-Wall -Werror -Wextra -std=c11 -D_GNU_SOURCE` for POSIX functions

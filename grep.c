@@ -1,6 +1,8 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <regex.h>
 #include "common/arg_parser.h"
 #include "common/file_utils.h"
@@ -19,6 +21,7 @@ typedef struct {
 } grep_flags;
 
 void print_matching_part(const char *line, regex_t *regex, int ignore_case) {
+    (void)ignore_case;  // Suppress unused parameter warning
     regmatch_t matches[1];
     const char *p = line;
     int offset = 0;
@@ -45,6 +48,8 @@ int match_line(const char *line, regex_t *regex) {
 
 int process_file_grep(const char *filename, regex_t **patterns, int pattern_count, 
                       grep_flags flags, int file_index, int total_files) {
+    (void)file_index;  // Suppress unused parameter warning
+    
     FILE *file = file_open_safe(filename);
     if (!file) {
         if (!flags.s) {
@@ -55,17 +60,17 @@ int process_file_grep(const char *filename, regex_t **patterns, int pattern_coun
 
     char *line = NULL;
     size_t len = 0;
-    ssize_t read;
+    ssize_t bytes_read;
     int line_num = 1;
     int match_count = 0;
     int printed_filename = 0;
     int has_match = 0;
 
-    while ((read = getline(&line, &len, file)) != -1) {
+    while ((bytes_read = getline(&line, &len, file)) != -1) {
         // Remove trailing newline for processing
-        if (read > 0 && line[read - 1] == '\n') {
-            line[read - 1] = '\0';
-            read--;
+        if (bytes_read > 0 && line[bytes_read - 1] == '\n') {
+            line[bytes_read - 1] = '\0';
+            bytes_read--;
         }
 
         int matched = 0;

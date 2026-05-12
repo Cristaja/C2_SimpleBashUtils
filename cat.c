@@ -1,6 +1,8 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include "common/arg_parser.h"
 #include "common/file_utils.h"
 
@@ -48,19 +50,18 @@ int process_file(const char *filename, cat_flags flags) {
 
     char *line = NULL;
     size_t len = 0;
-    ssize_t read;
+    ssize_t bytes_read;
     int line_num = 1;
     int prev_empty = 0;
-    int consecutive_empty = 0;
 
-    while ((read = getline(&line, &len, file)) != -1) {
+    while ((bytes_read = getline(&line, &len, file)) != -1) {
         // Remove trailing newline for processing
-        int has_newline = (read > 0 && line[read - 1] == '\n');
-        if (has_newline) line[read - 1] = '\0';
+        int has_newline = (bytes_read > 0 && line[bytes_read - 1] == '\n');
+        if (has_newline) line[bytes_read - 1] = '\0';
 
-        int is_empty = (read == 1 && has_newline) || 
-                       (has_newline && read == 1) ||
-                       (read == 0 && has_newline) ||
+        int is_empty = (bytes_read == 1 && has_newline) || 
+                       (has_newline && bytes_read == 1) ||
+                       (bytes_read == 0 && has_newline) ||
                        (strlen(line) == 0);
 
         // Squeeze empty lines
@@ -73,7 +74,6 @@ int process_file(const char *filename, cat_flags flags) {
             prev_empty = 1;
         } else {
             prev_empty = 0;
-            consecutive_empty = 0;
         }
 
         // Print line number

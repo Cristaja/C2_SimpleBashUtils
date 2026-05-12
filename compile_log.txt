@@ -1,48 +1,18 @@
 s21_cat build failed:
-gcc -Wall -Werror -Wextra -std=c11 -g -c cat.c -o cat.o
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c cat.c -o cat.o
 
-cat.c: In function ‘process_file’:
-cat.c:51:5: error: unknown type name ‘ssize_t’; did you mean ‘size_t’?
-   51 |     ssize_t read;
-      |     ^~~~~~~
-      |     size_t
-cat.c:56:20: error: implicit declaration of function ‘getline’ [-Werror=implicit-function-declaration]
-   56 |     while ((read = getline(&line, &len, file)) != -1) {
-      |                    ^~~~~~~
-cat.c:54:9: error: variable ‘consecutive_empty’ set but not used [-Werror=unused-but-set-variable]
-   54 |     int consecutive_empty = 0;
-      |         ^~~~~~~~~~~~~~~~~
-cat.c: In function ‘main’:
-cat.c:139:20: error: implicit declaration of function ‘strdup’; did you mean ‘strcmp’? [-Werror=implicit-function-declaration]
-  139 |         files[0] = strdup("-");
-      |                    ^~~~~~
-      |                    strcmp
-cat.c:139:18: error: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Werror=int-conversion]
-  139 |         files[0] = strdup("-");
-      |                  ^
+cat.c:1: error: "_GNU_SOURCE" redefined [-Werror]
+    1 | #define _GNU_SOURCE
+      | 
+<command-line>: note: this is the location of the previous definition
 cc1: all warnings being treated as errors
 make: *** [Makefile:27: cat.o] Ошибка 1
 s21_grep build failed:
-gcc -Wall -Werror -Wextra -std=c11 -g -c grep.c -o grep.o
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c grep.c -o grep.o
 
-grep.c: In function ‘print_matching_part’:
-grep.c:21:64: error: unused parameter ‘ignore_case’ [-Werror=unused-parameter]
-   21 | void print_matching_part(const char *line, regex_t *regex, int ignore_case) {
-      |                                                            ~~~~^~~~~~~~~~~
-grep.c: In function ‘process_file_grep’:
-grep.c:64:20: error: implicit declaration of function ‘getline’ [-Werror=implicit-function-declaration]
-   64 |     while ((read = getline(&line, &len, file)) != -1) {
-      |                    ^~~~~~~
-grep.c:47:45: error: unused parameter ‘file_index’ [-Werror=unused-parameter]
-   47 |                       grep_flags flags, int file_index, int total_files) {
-      |                                         ~~~~^~~~~~~~~~
-grep.c: In function ‘main’:
-grep.c:170:20: error: implicit declaration of function ‘strdup’; did you mean ‘strcmp’? [-Werror=implicit-function-declaration]
-  170 |         files[0] = strdup("-");
-      |                    ^~~~~~
-      |                    strcmp
-grep.c:170:18: error: assignment to ‘char *’ from ‘int’ makes pointer from integer without a cast [-Werror=int-conversion]
-  170 |         files[0] = strdup("-");
-      |                  ^
+grep.c:1: error: "_GNU_SOURCE" redefined [-Werror]
+    1 | #define _GNU_SOURCE
+      | 
+<command-line>: note: this is the location of the previous definition
 cc1: all warnings being treated as errors
 make: *** [Makefile:27: grep.o] Ошибка 1
