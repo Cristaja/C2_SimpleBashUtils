@@ -1,16 +1,37 @@
 s21_cat build failed:
 gcc -Wall -Werror -Wextra -std=c11 -g -c cat.c -o obj/cat.o
 
-cat.c:2:10: fatal error: common/arg_parser.h: Нет такого файла или каталога
-    2 | #include "common/arg_parser.h"
-      |          ^~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make: *** [Makefile:38: obj/cat.o] Ошибка 1
+cat.c: In function ‘output_char’:
+cat.c:93:29: error: unused parameter ‘line_start’ [-Werror=unused-parameter]
+   93 |                         int line_start, int *empty_line_count) {
+      |                         ~~~~^~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [Makefile:30: obj/cat.o] Ошибка 1
 s21_grep build failed:
 gcc -Wall -Werror -Wextra -std=c11 -g -c grep.c -o obj/grep.o
 
-grep.c:2:10: fatal error: common/arg_parser.h: Нет такого файла или каталога
-    2 | #include "common/arg_parser.h"
-      |          ^~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make: *** [Makefile:41: obj/grep.o] Ошибка 1
+grep.c: In function ‘main’:
+grep.c:51:14: error: invalid type argument of ‘->’ (have ‘grep_flags’)
+   51 |     if (flags->l && file_matches > 0) {
+      |              ^~
+grep.c:54:14: error: invalid type argument of ‘->’ (have ‘grep_flags’)
+   54 |     if (flags->c && !flags->l) {
+      |              ^~
+grep.c:54:27: error: invalid type argument of ‘->’ (have ‘grep_flags’)
+   54 |     if (flags->c && !flags->l) {
+      |                           ^~
+grep.c:55:35: error: invalid type argument of ‘->’ (have ‘grep_flags’)
+   55 |       if (file_count > 1 && !flags->h)
+      |                                   ^~
+grep.c:61:12: error: invalid type argument of ‘->’ (have ‘grep_flags’)
+   61 |   if (flags->c && !flags->l && file_count == 0) {
+      |            ^~
+grep.c:61:25: error: invalid type argument of ‘->’ (have ‘grep_flags’)
+   61 |   if (flags->c && !flags->l && file_count == 0) {
+      |                         ^~
+grep.c: In function ‘match_line’:
+grep.c:153:41: error: unused parameter ‘flags’ [-Werror=unused-parameter]
+  153 |                       const grep_flags *flags, regmatch_t *pmatch) {
+      |                       ~~~~~~~~~~~~~~~~~~^~~~~
+cc1: all warnings being treated as errors
+make: *** [Makefile:33: obj/grep.o] Ошибка 1
