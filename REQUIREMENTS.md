@@ -1,44 +1,34 @@
-# Функциональные и нефункциональные требования
+# Requirements for C2_SimpleBashUtils
 
-## Функциональные требования
+## Functional Requirements
 
-### Утилита `s21_cat`
-- Поддержка следующих флагов (включая GNU-варианты):
-  - `-b` (--number-nonblank) – нумеровать только непустые строки.
-  - `-e` (подразумевает `-v`) – отображать символ конца строки как `$`.
-  - `-E` (GNU, без `-v`) – только `$` в конце строки.
-  - `-n` (--number) – нумеровать все строки.
-  - `-s` (--squeeze-blank) – сжимать несколько смежных пустых строк в одну.
-  - `-t` (подразумевает `-v`) – отображать табуляции как `^I`.
-  - `-T` (GNU) – только отображение табуляций `^I`.
-  - `-v` – отображать непечатаемые символы.
-- Вывод объединённого содержимого указанных файлов (или stdin, если файлы не заданы).
-- Поддержка вызова как с флагами, так и без них.
+### s21_cat
+Must support the following flags:
+- `-b` (GNU: --number-nonblank): number only non-empty lines
+- `-e` implies -v (GNU: -E the same but without -v): display $ at end of lines and show non-printing characters
+- `-E` (GNU: --show-ends): display $ at end of lines
+- `-n` (GNU: --number): number all output lines
+- `-s` (GNU: --squeeze-blank): squeeze multiple adjacent blank lines
+- `-t` implies -v (GNU: -T the same but without -v): display tabs as ^I and show non-printing characters
+- `-T` (GNU: --show-tabs): display TAB characters as ^I
+- `-v` (GNU: --show-nonprinting): display non-printing characters
 
-### Утилита `s21_grep` (базовая часть)
-- Поддержка флагов: `-e`, `-i`, `-v`, `-c`, `-l`, `-n`.
-- Поиск по одному или нескольким шаблонам (флаг `-e` может повторяться).
-- Обработка одного или нескольких файлов.
-- Вывод результатов в соответствии с поведением `grep` (busybox).
+### s21_grep
+Must support the following flags:
+- `-e`: pattern from command line (can be used multiple times)
+- `-i`: ignore case distinctions
+- `-v`: invert match (select non-matching lines)
+- `-c`: count of matching lines
+- `-l`: print only names of files with matching lines
+- `-n`: print line number with output lines
+- `-h`: suppress filename prefix on output
+- `-s`: suppress error messages about nonexistent or unreadable files
+- `-f`: read patterns from file (one per line)
+- `-o`: print only the matching part of a line
 
-### Бонусные части (выполняются по желанию)
-- **Часть 3**: добавить флаги `-h`, `-s`, `-f`, `-o`.
-- **Часть 4**: поддержка комбинаций флагов (например `-iv`, `-in`).
-
-## Нефункциональные требования
-- Язык реализации: C11. Строгое соблюдение стандарта (без расширений GCC).
-- Компилятор: `gcc` с флагами `-Wall -Werror -Wextra -std=c11`.
-- Стиль кода: Google C++ Style Guide (с учётом C).
-- Структурное программирование: запрещено использование `goto`, неконтролируемых `break/continue`, функций длиной более 40 строк (рекомендация).
-- **Проверка на утечки памяти** – каждая новая функциональность должна быть проверена через `valgrind --leak-check=full` без ошибок. Команда `make valgrind` должна завершаться с кодом 0.
-- **Покрытие тестами** – обязательно наличие интеграционных тестов (файл `test.sh`), сравнивающих вывод с оригинальными утилитами. `make gcov_report` должен показывать покрытие строк кода не менее 80%.
-- **Статический анализ** – перед каждым коммитом запускать `make check` (cppcheck + clang-format). Ошибки статического анализа запрещены.
-- **Ручное ревью** – перед слиянием в основную ветку разработчик заполняет чек-лист из `make review` и прикладывает его к пул-реквесту.
-- Компилятор: `gcc` с флагами `-Wall -Werror -Wextra -std=c11`.
-- Стиль кода: Google C++ Style Guide (с учётом C).
-- Структурное программирование: запрещено использование `goto`, неконтролируемых `break/continue`, функций длиной более 40 строк (рекомендация).
-- Сборка через `Makefile` с целями: `s21_cat`, `s21_grep`, `all`, `clean`, `test` (опционально).
-- Отсутствие дублирования: общий код (парсинг аргументов, обработка файлов) выносится в `src/common/`.
-- Тестирование: интеграционные тесты сравнивают вывод `s21_cat` / `s21_grep` с поведением оригинальных утилит `cat` и `grep` в окружении Alpine 3.20.
-- Поддержка только чтения файлов (ввод через stdin – необязателен, но приветствуется).
-- Для регулярных выражений используется `regex.h` (POSIX.1-2017).
+## Non-Functional Requirements
+- Code must compile with `-Wall -Werror -Wextra -std=c11`
+- No memory leaks (verified with valgrind)
+- Code coverage must be at least 80%
+- Code must follow Google C Style Guide
+- Must handle stdin input when no files specified or "-" given

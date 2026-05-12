@@ -1,44 +1,27 @@
 #ifndef COMMON_ARG_PARSER_H
 #define COMMON_ARG_PARSER_H
 
-#include <stdbool.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// CAT flags structure
-typedef struct {
-    bool b; // number non-empty lines
-    bool e; // show $ and imply -v
-    bool E; // show $ only
-    bool n; // number all lines
-    bool s; // squeeze blank lines
-    bool t; // show tabs as ^I and imply -v
-    bool T; // show tabs as ^I only
-    bool v; // show non-printing
-} cat_flags;
+// Parse cat command line arguments
+// Returns 0 on success, non-zero on error
+int parse_cat_args(int argc, char *argv[], int *b, int *e, int *E, int *n, 
+                   int *s, int *t, int *T, int *v, char ***files, int *file_count);
 
-// GREP flags structure
-typedef struct {
-    bool e; // pattern provided via -e
-    bool i; // case-insensitive
-    bool v; // invert match
-    bool c; // count matches
-    bool l; // list filenames with at least one match
-    bool n; // show line numbers
-    bool h; // suppress filename prefix
-    bool s; // suppress errors
-    bool f; // read patterns from file
-    bool o; // print only matching parts
-} grep_flags;
+// Parse grep command line arguments
+// Returns 0 on success, non-zero on error
+int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
+                    int *l, int *n, int *h, int *s, int *f, int *o,
+                    char ***patterns, int *pattern_count, char ***files, 
+                    int *file_count, char **pattern_file);
 
-// Parse arguments for s21_cat
-int parse_cat_args(int argc, char **argv, cat_flags *flags,
-                   char ***files, int *file_count);
+// Free parsed arguments arrays
+void free_parsed_args(char **files, int file_count, char **patterns, int pattern_count);
 
-// Parse arguments for s21_grep
-int parse_grep_args(int argc, char **argv, grep_flags *flags,
-                    char ***patterns, int *pattern_count,
-                    char ***files, int *file_count);
+#ifdef __cplusplus
+}
+#endif
 
-// Free dynamically allocated arrays (patterns/files)
-void free_parsed_args(char **arr, int count);
-
-#endif // COMMON_ARG_PARSER_H
+#endif  // COMMON_ARG_PARSER_H
