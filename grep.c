@@ -12,14 +12,14 @@ typedef struct {
 } pattern_list;
 
 static int compile_patterns(pattern_list *pl, char **patterns, int pattern_count,
-                            grep_flags *flags);
+                            const grep_flags *flags);
 static void free_patterns(pattern_list *pl);
 static void process_file(const char *path, const pattern_list *pl,
                          const grep_flags *flags, int file_count,
                          int *total_matches, int *file_matches);
 static void print_match(const char *line, const char *filename, int line_num,
                         const grep_flags *flags, int file_count,
-                        char *match_start, char *match_end);
+                        regmatch_t *pmatch);
 static int match_line(const char *line, const pattern_list *pl,
                       regmatch_t *pmatch);
 
@@ -69,13 +69,14 @@ int main(int argc, char **argv) {
 }
 
 static int compile_patterns(pattern_list *pl, char **patterns, int pattern_count,
-                            grep_flags *flags) {
+                            const grep_flags *flags) {
   pl->count = pattern_count;
   pl->regexes = malloc(pl->count * sizeof(regex_t));
   if (!pl->regexes) return -1;
 
-  int cflags = REG_EXTENDED | REG_NOSUB;
+  int cflags = REG_EXTENDED;
   if (flags->i) cflags |= REG_ICASE;
+  if (!flags->o) cflags |= REG_NOSUB;
 
   for (int i = 0; i < pl->count; ++i) {
     if (regcomp(&pl->regexes[i], patterns[i], cflags) != 0) {
@@ -109,7 +110,6 @@ static void process_file(const char *path, const pattern_list *pl,
   int matches_in_file = 0;
 
   while ((read = file_read_line(fp, &line, &len)) != -1) {
-    // Remove trailing newline
     if (read > 0 && line[read - 1] == '\n') line[read - 1] = '\0';
 
     regmatch_t pmatch;
@@ -120,11 +120,7 @@ static void process_file(const char *path, const pattern_list *pl,
       (*total_matches)++;
 
       if (!flags->c && !flags->l) {
-        print_match(line, path, line_num, flags, file_count, line + pmatch.rm_so,
-                    line + pmatch.rm_eo);
-      } else if (flags->o && matched && !flags->c && !flags->l) {
-        // For -o with multiple matches in line, we'd need to iterate
-        // but for simplicity we show first match
+        print_match(line, path, line_num, flags, file_count, &pmatch);
       }
     }
     line_num++;
@@ -137,12 +133,14 @@ static void process_file(const char *path, const pattern_list *pl,
 
 static void print_match(const char *line, const char *filename, int line_num,
                         const grep_flags *flags, int file_count,
-                        char *match_start, char *match_end) {
+                        regmatch_t *pmatch) {
   if (!flags->h && file_count > 1) printf("%s:", filename);
   if (flags->n) printf("%d:", line_num);
-  if (flags->o) {
-    // Print only matching part
-    fwrite(match_start, 1, match_end - match_start, stdout);
+
+  if (flags->o && pmatch && pmatch->rm_so != -1) {
+    for (int i = pmatch->rm_so; i < pmatch->rm_eo; ++i) {
+      putchar(line[i]);
+    }
   } else {
     printf("%s", line);
   }
@@ -151,10 +149,9 @@ static void print_match(const char *line, const char *filename, int line_num,
 
 static int match_line(const char *line, const pattern_list *pl,
                       regmatch_t *pmatch) {
-  if (!pmatch) return 0;
-
   for (int i = 0; i < pl->count; ++i) {
-    if (regexec(&pl->regexes[i], line, 1, pmatch, 0) == 0) {
+    int ret = regexec(&pl->regexes[i], line, 1, pmatch, 0);
+    if (ret == 0) {
       return 1;
     }
   }

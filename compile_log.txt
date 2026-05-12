@@ -1,1 +1,2 @@
-make: Цель «all» не требует выполнения команд.
+gcc -Wall -Werror -Wextra -std=c11 -g -c grep.c -o obj/grep.o
+gcc -Wall -Werror -Wextra -std=c11 -g -o s21_grep obj/grep.o obj/arg_parser.o obj/file_utils.o
