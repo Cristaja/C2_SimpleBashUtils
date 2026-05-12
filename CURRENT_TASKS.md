@@ -4,8 +4,8 @@
 
 ### Core Infrastructure
 - [x] Create project directory structure
-- [x] Implement common/arg_parser module
-- [x] Implement common/file_utils module
+- [ ] Implement common/arg_parser module
+- [ ] Implement common/file_utils module
 - [x] Create Makefile with all required targets
 
 ### s21_cat Implementation
@@ -17,7 +17,8 @@
 - [x] End-of-line markers
 
 ### s21_grep Implementation
-- [x] Implement all required flags (-e, -i, -v, -c, -l, -n, -h, -s, -f, -o)
+- [x] Implement all required flags (-e, -i, -v, -c, -l, -n, -h, -s, -f)
+- [ ] Implement full `-o` flag (print **all** matches per line, not just first) – **IN PROGRESS** (fixed in this PR)
 - [x] Multiple pattern support
 - [x] Pattern file reading (-f)
 - [x] Regex compilation and matching
@@ -39,24 +40,23 @@
 ## Pending Tasks
 
 ### Testing
-- [ ] Create comprehensive test suite (test.sh)
-- [ ] Compare s21_cat output with GNU cat
-- [ ] Compare s21_grep output with GNU grep
-- [ ] Test edge cases (empty files, large files, special characters)
-- [ ] Test flag combinations
-- [ ] Test error handling scenarios
+- [x] Create comprehensive test suite (test.sh)
+- [x] Compare s21_cat output with GNU cat
+- [x] Compare s21_grep output with GNU grep
+- [ ] Test edge cases (empty files, large files, special characters) – *partial*
+- [x] Test flag combinations
+- [x] Test error handling scenarios
 
-### Code Coverage
-- [ ] Run make gcov_report
-- [ ] Achieve >80% coverage (optional but recommended)
-- [ ] Cover all code paths
+### Code Coverage (Mandatory)
+- [ ] Run `make gcov_report` and achieve **≥80% line coverage**
+- [ ] Cover all code paths, especially error handling branches
 
-### Final Validation
-- [ ] Run valgrind --leak-check=full on both utilities
-- [ ] Verify no memory leaks with various inputs
-- [ ] Test with AddressSanitizer (ASan)
-- [ ] Ensure all warning-free compilation
-- [ ] Verify compliance with Google coding standards
+### Final Validation (Mandatory)
+- [ ] Run `make valgrind` – **must exit with 0** (no leaks)
+- [ ] Run `make check` – **must pass** (no cppcheck warnings, clang-format clean)
+- [ ] Verify no undefined behavior with AddressSanitizer (ASan)
+- [ ] Ensure all warning-free compilation (`make clean all`)
+- [ ] Verify compliance with Google coding standards (line length ≤80? - as per Google)
 
 ## Known Issues / Technical Debt
 
@@ -75,11 +75,11 @@
 - No known issues
 
 ## Next Steps
-1. Create test.sh with comprehensive test cases
-2. Run memory leak detection tools
-3. Generate coverage report and analyze uncovered code
-4. Fix any remaining issues discovered during testing
-5. Submit for final review
+1. [x] Create `test.sh` with comprehensive test cases
+2. [ ] Run `make valgrind` and fix any leaks
+3. [ ] Generate coverage report (`make gcov_report`) and improve uncovered lines
+4. [ ] Run `make check` and fix all style/static analysis issues
+5. [ ] Submit for final review (attach output of `make review`)
 
 ## Build Instructions
 ```bash

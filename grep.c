@@ -115,12 +115,18 @@ static void process_file(const char *path, const pattern_list *pl,
     regmatch_t pmatch;
     int matched = match_line(line, pl, &pmatch);
 
-    if ((matched && !flags->v) || (!matched && flags->v)) {
+    int line_matched = (matched && !flags->v) || (!matched && flags->v);
+    if (line_matched) {
       matches_in_file++;
       (*total_matches)++;
 
       if (!flags->c && !flags->l) {
-        print_match(line, path, line_num, flags, file_count, &pmatch);
+        if (flags->o && !flags->v) {
+          // Print each match separately
+          print_all_matches(line, path, line_num, flags, file_count, pl);
+        } else {
+          print_match(line, path, line_num, flags, file_count, &pmatch);
+        }
       }
     }
     line_num++;
@@ -134,17 +140,20 @@ static void process_file(const char *path, const pattern_list *pl,
 static void print_match(const char *line, const char *filename, int line_num,
                         const grep_flags *flags, int file_count,
                         regmatch_t *pmatch) {
-  if (!flags->h && file_count > 1) printf("%s:", filename);
-  if (flags->n) printf("%d:", line_num);
-
   if (flags->o && pmatch && pmatch->rm_so != -1) {
+    // Print only the matching part(s) – may be called multiple times per line
+    if (!flags->h && file_count > 1) printf("%s:", filename);
+    if (flags->n) printf("%d:", line_num);
     for (int i = pmatch->rm_so; i < pmatch->rm_eo; ++i) {
       putchar(line[i]);
     }
+    printf("\n");
   } else {
-    printf("%s", line);
+    // Normal output (entire line)
+    if (!flags->h && file_count > 1) printf("%s:", filename);
+    if (flags->n) printf("%d:", line_num);
+    printf("%s\n", line);
   }
-  printf("\n");
 }
 
 static int match_line(const char *line, const pattern_list *pl,
@@ -156,4 +165,42 @@ static int match_line(const char *line, const pattern_list *pl,
     }
   }
   return 0;
+}
+
+// New helper: find all matches for -o flag
+static void print_all_matches(const char *line, const char *filename, int line_num,
+                              const grep_flags *flags, int file_count,
+                              const pattern_list *pl) {
+  const char *cursor = line;
+  regmatch_t pmatch;
+  int found_any = 0;
+
+  while (*cursor) {
+    int matched = 0;
+    for (int i = 0; i < pl->count; ++i) {
+      if (regexec(&pl->regexes[i], cursor, 1, &pmatch, 0) == 0) {
+        matched = 1;
+        break;
+      }
+    }
+    if (!matched) break;
+
+    if (pmatch.rm_so == pmatch.rm_eo) { // zero-length match, advance to avoid infinite loop
+      if (*cursor == '\0') break;
+      cursor++;
+      continue;
+    }
+
+    // Print this match
+    if (!flags->h && file_count > 1) printf("%s:", filename);
+    if (flags->n) printf("%d:", line_num);
+    for (int i = pmatch.rm_so; i < pmatch.rm_eo; ++i) {
+      putchar(cursor[i]);
+    }
+    printf("\n");
+
+    cursor += pmatch.rm_eo;
+    found_any = 1;
+  }
+  (void)found_any;
 }

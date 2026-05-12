@@ -66,6 +66,25 @@ Shared utilities used by both `s21_cat` and `s21_grep`.
 - `s21_cat`: Build only cat utility
 - `s21_grep`: Build only grep utility
 - `clean`: Remove object files and executables
+- `test`: Run test suite (`test.sh`)
+- `gcov_report` / `coverage`: Generate code coverage report (requires `lcov` and `genhtml`)
+- `valgrind`: Run test suite under Valgrind to detect memory leaks
+- `check`: Run static analysis (`cppcheck`) and code style check (`clang-format`)
+- `review`: Display a manual code review checklist
+- `install`: Install binaries to `/usr/local/bin`
+- `uninstall`: Remove installed binaries
+- `dvi`: Display documentation info
+- `dist`: Create distribution archive
+
+### Quality Gates (must pass before merge)
+1. `make` – no compilation warnings.
+2. `make test` – all integration tests pass.
+3. `make valgrind` – zero memory leaks.
+4. `make check` – no static analysis warnings, code formatting compliant.
+5. `make gcov_report` – line coverage ≥80% (view `gcov_report/index.html`).
+- `s21_cat`: Build only cat utility
+- `s21_grep`: Build only grep utility
+- `clean`: Remove object files and executables
 - `test`: Run test suite
 - `gcov_report`: Generate code coverage report
 - `install`: Install binaries to /usr/local/bin

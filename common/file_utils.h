@@ -3,17 +3,18 @@
 
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+// Open file for reading; if path is "-", returns stdin.
+// If silent is true, suppresses error messages.
+FILE *file_open_safe(const char *path, const char *mode, int silent);
 
-FILE *file_open_safe(const char *path, const char *mode, int quiet);
-ssize_t file_read_line(FILE *fp, char **lineptr, size_t *n);
+// Read a line from fp using getline. Returns number of characters read (including newline),
+// or -1 on EOF/error.
+ssize_t file_read_line(FILE *fp, char **line, size_t *len);
+
+// Close file (does nothing if fp == stdin).
 void file_close_safe(FILE *fp, const char *path);
+
+// Check if FILE* is standard input (used to avoid fclose on stdin).
 int file_is_stdin(FILE *fp);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif  // COMMON_FILE_UTILS_H
+#endif // COMMON_FILE_UTILS_H

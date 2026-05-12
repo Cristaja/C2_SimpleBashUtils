@@ -47,7 +47,8 @@ clean:
 	$(RM) $(TARGETS)
 	$(RM) *.gcda *.gcno *.gcov
 
-gcov_report: CFLAGS += -fprofile-arcs -ftest-coverage
+gcov_report: CFLAGS += -fprofile-arcs -ftest-coverage --coverage
+gcov_report: LDFLAGS += -fprofile-arcs -ftest-coverage --coverage
 gcov_report: clean test
 	@mkdir -p gcov_report
 	@if command -v lcov >/dev/null 2>&1 && command -v genhtml >/dev/null 2>&1; then \
@@ -75,4 +76,27 @@ dist: clean
 	tar -czf ../C2_SimpleBashUtils_dist.tar.gz -C .. C2_SimpleBashUtils_dist
 	rm -rf ../C2_SimpleBashUtils_dist
 
-.PHONY: all clean test gcov_report install uninstall dvi dist
+valgrind: $(TARGETS) test
+	@echo "Running test suite under Valgrind..."
+	$(VALGRIND) ./test.sh
+
+check:
+	@echo "Running cppcheck..."
+	$(CHECKER) --enable=all --suppress=missingIncludeSystem --error-exitcode=1 . || (echo "cppcheck failed"; exit 1)
+	@echo "Checking code style (clang-format)..."
+	clang-format --dry-run --Werror $$(find . -name '*.c' -o -name '*.h') || (echo "clang-format violations found"; exit 1)
+
+review:
+	@echo "=== Manual Code Review Checklist ==="
+	@echo "1. Every function: is it < 40 lines? (structural programming)"
+	@echo "2. No 'goto', no unsafe functions (strcpy, sprintf, gets)."
+	@echo "3. All dynamic allocations freed (verify via valgrind)."
+	@echo "4. Edge cases: empty files, very long lines, missing files, stdin."
+	@echo "5. Flag combinations tested (e.g., cat -ben, grep -iv)."
+	@echo "6. No compiler warnings (-Wall -Werror -Wextra)."
+	@echo "7. test.sh passes with 0 differences from original utilities."
+	@echo "8. gcov_report shows at least 80% line coverage."
+
+coverage: gcov_report
+
+.PHONY: all clean test gcov_report install uninstall dvi dist valgrind check review coverage
