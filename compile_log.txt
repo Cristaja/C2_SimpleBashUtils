@@ -1,18 +1,32 @@
 s21_cat build failed:
-gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c cat.c -o cat.o
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c common/arg_parser.c -o common/arg_parser.o
 
-cat.c:1: error: "_GNU_SOURCE" redefined [-Werror]
+common/arg_parser.c:1: error: "_GNU_SOURCE" redefined [-Werror]
     1 | #define _GNU_SOURCE
       | 
 <command-line>: note: this is the location of the previous definition
+common/arg_parser.c: In function ‘parse_grep_args’:
+common/arg_parser.c:70:31: error: invalid type argument of unary ‘*’ (have ‘int’)
+   70 |                     case 'i': *i = 1; break;
+      |                               ^~
+common/arg_parser.c:41:58: error: unused parameter ‘i’ [-Werror=unused-parameter]
+   41 | int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
+      |                                                     ~~~~~^
 cc1: all warnings being treated as errors
-make: *** [Makefile:27: cat.o] Ошибка 1
+make: *** [Makefile:24: common/arg_parser.o] Ошибка 1
 s21_grep build failed:
-gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c grep.c -o grep.o
+gcc -Wall -Werror -Wextra -std=c11 -g -D_GNU_SOURCE -c common/arg_parser.c -o common/arg_parser.o
 
-grep.c:1: error: "_GNU_SOURCE" redefined [-Werror]
+common/arg_parser.c:1: error: "_GNU_SOURCE" redefined [-Werror]
     1 | #define _GNU_SOURCE
       | 
 <command-line>: note: this is the location of the previous definition
+common/arg_parser.c: In function ‘parse_grep_args’:
+common/arg_parser.c:70:31: error: invalid type argument of unary ‘*’ (have ‘int’)
+   70 |                     case 'i': *i = 1; break;
+      |                               ^~
+common/arg_parser.c:41:58: error: unused parameter ‘i’ [-Werror=unused-parameter]
+   41 | int parse_grep_args(int argc, char *argv[], int *e, int *i, int *v, int *c,
+      |                                                     ~~~~~^
 cc1: all warnings being treated as errors
-make: *** [Makefile:27: grep.o] Ошибка 1
+make: *** [Makefile:24: common/arg_parser.o] Ошибка 1
